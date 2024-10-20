@@ -21,11 +21,10 @@ Continuing on with the next project section, our research directed us toward the
 # Whats Needed?
 
 1. A computer
-2. An internet connection
-3. An IDE
 
 # Setting Up The Environment...
 
-1. install python
-2. setup Environment
-3. install scikit-learn (https://scikit-learn.org/1.5/install.html#install-official-release)
+1. Navigate into the environment folder with "cd sklearn-env"
+2. Install all required dependecies with "pipenv install"
+3. Start the environment with "pipenv shell"
+4. To close the environement run "exit"
