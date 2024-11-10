@@ -17,5 +17,5 @@ pipenv shell
 ## Step 3: Run The File
 
 ```terminal
-src/cleaningdata.py --csv "data/raw/Bad KB/badkb.csv"
+src/cleaningdata.py --csv "path/to/csv file"
 ```
