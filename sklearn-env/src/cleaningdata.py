@@ -31,6 +31,11 @@ def cleaning_data(in_csv):
     # print records
     print(df.head())
 
+    # missing data or Nans: You can either drop those rows completely, or you can calculate the mean for that column and replace the NaNs with that. 
+    # if a column contains all NaN values remove it?
+    # When a column has a low # of NaN values replace them with a mean, median, or mode val
+    # values that are out of range or do not match the expected format should be corrected or replaced with valid value/converted to correct format
+
 # script requires command line argument --csv "file path"
 def command_line_args():
     # parses argument input
