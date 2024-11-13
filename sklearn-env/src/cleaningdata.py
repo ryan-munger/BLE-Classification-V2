@@ -28,13 +28,27 @@ def cleaning_data(in_csv):
     # select the columns we want
     df = df[columns_to_keep]
 
+    # if column is missing all or over 70% of info (NaN) drop entire column
+    threshold = len(df) * 0.7
+    df = df.dropna(axis=1, how='all')
+    df = df.dropna(axis=1, thresh=threshold)
+
+    # if less than 70% NaN then fill with mean or mode values respectfully
+    df['Timestamp'] = df['Timestamp'].fillna(df['Timestamp'].mode()[0])
+    df['RSSI'] = df['RSSI'].fillna(df['RSSI'].mean())
+    df['Channel Index'] = df['Channel Index'].fillna(df['Channel Index'].mode()[0])
+    df['Advertising Address'] = df['Advertising Address'].fillna(df['Advertising Address'].mode()[0])
+    df['Company ID'] = df['Company ID'].fillna(df['Company ID'].mode()[0])
+    df['Packet counter'] = df['Packet counter'].fillna(df['Packet counter'].mean())
+    df['Protocol version'] = df['Protocol version'].fillna(df['Protocol version'].mean())
+    df['Power Level (dBm)'] = df['Power Level (dBm)'].fillna(df['Power Level (dBm)'].mean())
+    df['UUID 16'] = df['UUID 16'].fillna(df['UUID 16'].mode()[0])
+   
+    # values that are out of range or do not match the expected format should be corrected or replaced with valid value/converted to correct format
+    # TODO
+
     # print records
     print(df.head())
-
-    # missing data or Nans: You can either drop those rows completely, or you can calculate the mean for that column and replace the NaNs with that. 
-    # if a column contains all NaN values remove it?
-    # When a column has a low # of NaN values replace them with a mean, median, or mode val
-    # values that are out of range or do not match the expected format should be corrected or replaced with valid value/converted to correct format
 
 # script requires command line argument --csv "file path"
 def command_line_args():
