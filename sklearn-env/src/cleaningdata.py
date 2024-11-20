@@ -29,10 +29,12 @@ def cleaning_data(in_csv):
     # select the columns we want
     df = df[columns_to_keep]
 
+    # --- not doing rn ----
     # if column is missing all or over 70% of info (NaN) drop entire column
     #threshold = len(df) * 0.7
     #df = df.dropna(axis=1, how='all')
     #df = df.dropna(axis=1, thresh=threshold)
+    # values that are out of range or do not match the expected format should be corrected or replaced with valid value/converted to correct format
 
     # if less than 70% NaN then fill with mean or mode values respectfully
     df['Timestamp'] = df['Timestamp'].fillna(-1.0)
@@ -44,9 +46,6 @@ def cleaning_data(in_csv):
     df['Protocol version'] = df['Protocol version'].fillna(-1)
     df['Power Level (dBm)'] = df['Power Level (dBm)'].fillna(-255)
     df['UUID 16'] = df['UUID 16'].fillna("None")
-   
-    # values that are out of range or do not match the expected format should be corrected or replaced with valid value/converted to correct format
-    # TODO
 
     print("Data has been cleansed at cleansed_" + str(in_csv))
     df.to_csv("cleansed_" + str(in_csv), index=False)
