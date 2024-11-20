@@ -7,3 +7,4 @@
 - [ ] look over model and ensure random forest algorithm  (MLmodel.py)
 - [ ] train the model     (MLmodel.py)
 - [ ] Maintain or fix any errors with the  (MLmodel.py)
+- [ ] Train on the entire csv and not just the columns to keep (do both) (cleaningdata.py) (MLmodel.py)
