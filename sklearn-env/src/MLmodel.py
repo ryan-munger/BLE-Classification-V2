@@ -11,16 +11,6 @@ from sklearn.metrics import classification_report
 LABEL_MALICIOUS = 1  # Malicious label
 LABEL_BENIGN = 0  # Benign label
 
-# Placeholder for MAC address linking
-def link_mac_addresses(data):
-    """
-    Placeholder for functionality to link MAC addresses.
-    Add the implementation to correlate MAC addresses here.
-    """
-    # Example: Group data by MAC addresses to identify relationships
-    # mac_groups = data.groupby('Source')
-    pass
-
 # Model testing and evaluation
 def test_model():
     pass
@@ -104,9 +94,6 @@ def main():
 
     # Load data
     X, y = load_data(args.csv)
-
-    # Link MAC addresses (placeholder functionality)
-    link_mac_addresses(X)
 
     # Train and evaluate the model
     model = train_model(X, y)
