@@ -24,6 +24,7 @@ def cleaning_data(in_csv):
         'Protocol version',
         'Power Level (dBm)',
         'UUID 16'
+        'Label'
     ]
 
     # select the columns we want
