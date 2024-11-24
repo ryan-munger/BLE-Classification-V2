@@ -6,7 +6,6 @@ import argparse
 import sys
 
 # -- model imports --
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 
 # -- metrics/data imports --
@@ -18,22 +17,24 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 
-# label constants
-LABEL_MALICIOUS = 1  # malicious
-LABEL_BENIGN = 0  # benign
-
-def calculate():
-    pass
-
-# model testing and evaluation
-def test_model(model, X_test):
-    predictions = model.predict(X_test)
-    pass
+# model calculations and results
+def calculate(predictions, y_test):
+    cm = confusion_matrix(y_test, predictions)
+    TN, FP, FN, TP = cm.ravel()
+    print('True Positive(TP)  = ', TP)
+    print('False Positive(FP) = ', FP)
+    print('True Negative(TN)  = ', TN)
+    print('False Negative(FN) = ', FN)
+    accuracy =  (TP + TN) / (TP + FP + TN + FN)
+    print('Accuracy of the binary classifier = {:0.3f}'.format(accuracy))
+    print(classification_report(y_test, predictions))
+    print(accuracy_score)
 
 # model training
-def train_model():
+def train_model(X_train, y_train):
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
     pass
-    
 
 # load and preprocess the data
 def load_data(csv_file):
@@ -46,8 +47,11 @@ def load_data(csv_file):
 
     print(f"Processing file: {csv_file}")
 
-    X = dataset.iloc[:, :-1]    # x is explanatory variables (all columns containing information about the packets except label)
-    y = dataset.iloc[:, -1] # y is target variables (in our case it would be the label column)
+    # shuffle the dataset
+    shuffledset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
+
+    X = shuffledset.iloc[:, :-1]    # x is explanatory variables (all columns containing information about the packets except label)
+    y = shuffledset.iloc[:, -1] # y is target variables (in our case it would be the label column)
 
     return X, y
 
@@ -71,7 +75,7 @@ def main():
               file=sys.stderr)
         sys.exit(-1)
 
-    # call load data
+    # load the data
     X, y = load_data(args.csv)
 
     # split the dataset into training and testing sets
@@ -86,11 +90,11 @@ def main():
     # train
     model = train_model(X_train, y_train)
 
-    # test
-    test_model(model, X_test)
+    # model testing and evaluation
+    predictions = model.predict(X_test)
 
     # calculate metrics and performance
-    calculate()
+    calculate(predictions, y_test)
 
 # start script
 if __name__ == "__main__":
