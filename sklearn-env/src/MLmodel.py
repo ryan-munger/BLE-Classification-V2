@@ -16,13 +16,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
 
 # label constants
 LABEL_MALICIOUS = 1  # malicious
 LABEL_BENIGN = 0  # benign
 
+def calculate():
+    pass
+
 # model testing and evaluation
-def test_model():
+def test_model(model, X_test):
+    predictions = model.predict(X_test)
     pass
 
 # model training
@@ -38,8 +43,14 @@ def load_data(csv_file):
     except:
         print("Was unable to open the file...")
         sys.exit(-1)
-    
-    print(dataset.head())
+
+    print(f"Processing file: {csv_file}")
+
+    X = dataset.iloc[:, :-1]    # x is explanatory variables (all columns containing information about the packets except label)
+    y = dataset.iloc[:, -1] # y is target variables (in our case it would be the label column)
+
+    return X, y
+
 
 # grab the csv file as a command line argument
 def command_line_args():
@@ -61,11 +72,25 @@ def main():
         sys.exit(-1)
 
     # call load data
-    load_data(args.csv)
+    X, y = load_data(args.csv)
+
+    # split the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y , test_size=0.25, random_state=0)
+
+    # normalize the training data -- calculate mean and standard deviation
+    ss_train = StandardScaler()
+    X_train = ss_train.fit_transform(X_train)
+    ss_test = StandardScaler()
+    X_test = ss_test.fit_transform(X_test)
 
     # train
+    model = train_model(X_train, y_train)
 
     # test
+    test_model(model, X_test)
+
+    # calculate metrics and performance
+    calculate()
 
 # start script
 if __name__ == "__main__":
