@@ -17,5 +17,5 @@ pipenv shell
 ## Step 3: Run The File
 
 ```terminal
-src/MLmodel.py.py --csv "path/to/csv file"
+src/MLmodel.py --csv "path/to/csv file"
 ```

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#--imports--
+# --imports--
 import pandas as pd
 import numpy as np
 import argparse
@@ -11,7 +11,7 @@ import sys
 def cleaning_data(in_csv):
     try:
         # read the csv in to pandas using ISO encoding
-        df = pd.read_csv(in_csv, encoding='ISO-8859-1')
+        df = pd.read_csv(in_csv, encoding='ISO-8859-1', low_memory=False)
     except:
         print("Was unable to open the file...")
         sys.exit(-1)
@@ -53,7 +53,6 @@ def cleaning_data(in_csv):
     df = df[expected_columns]   # set to make sure
     
     # fill NaN with information
-    df['No.'] = df['No.'].fillna(-1)
     df['Source'] = df['Source'].fillna("00:00:00:00:00:00")
     df['Destination'] = df['Destination'].fillna("broadcast")
     df['Protocol'] = df['Protocol'].fillna("Unknown")
@@ -72,15 +71,10 @@ def cleaning_data(in_csv):
     df['Info'] = df['Info'].fillna("ADV_NONCONN_IND")
     df['Label'] = df['Label'].fillna(-1)
 
-    # print records
-    print(df.head())
-
-    # save the cleaned data to a csv file in the cleaned folder
+    # save the cleaned data to the script dir
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    cleaned_folder = os.path.join(script_dir, "../data/cleaned")
-    os.makedirs(cleaned_folder, exist_ok=True)
     input_file_name = os.path.basename(in_csv)
-    output_file = os.path.join(cleaned_folder, f"cleansed_{input_file_name}")
+    output_file = os.path.join(script_dir, f"cleansed_{input_file_name}")
     df.to_csv(output_file, index=False)
     print(f"Data has been cleansed and saved at: {output_file}")
 
