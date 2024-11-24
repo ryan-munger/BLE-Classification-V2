@@ -1,34 +1,39 @@
 #!/usr/bin/env python3
+
+#--imports--
 import pandas as pd
 import numpy as np
-
 import argparse
 import os.path
 import sys
 
-
-# cleans the data
+# function to clean the data
 def cleaning_data(in_csv):
-    # read the csv in to pandas using ISO encoding
-    df = pd.read_csv(in_csv, encoding='ISO-8859-1')
+    try:
+        # read the csv in to pandas using ISO encoding
+        df = pd.read_csv(in_csv, encoding='ISO-8859-1')
+    except:
+        print("Was unable to open the file...")
+        sys.exit(1)
 
+    # --- not doing rn ----
     # list of columns we want to keep (provided by CS team)
-    columns_to_keep = [
-        'No.',
-        'Timestamp',
-        'RSSI',
-        'Channel Index',
-        'Advertising Address',
-        'Company ID',
-        'Packet counter',
-        'Protocol version',
-        'Power Level (dBm)',
-        'UUID 16'
-        'Label'
-    ]
+    #columns_to_keep = [
+    #    'No.',
+    #    'Timestamp',
+    #    'RSSI',
+    #    'Channel Index',
+    #    'Advertising Address',
+    #    'Company ID',
+    #    'Packet counter',
+    #    'Protocol version',
+    #    'Power Level (dBm)',
+    #    'UUID 16'
+    #    'Label'
+    #]
 
     # select the columns we want
-    df = df[columns_to_keep]
+    # df = df[columns_to_keep]
 
     # --- not doing rn ----
     # if column is missing all or over 70% of info (NaN) drop entire column
@@ -37,7 +42,22 @@ def cleaning_data(in_csv):
     #df = df.dropna(axis=1, thresh=threshold)
     # values that are out of range or do not match the expected format should be corrected or replaced with valid value/converted to correct format
 
-    # if less than 70% NaN then fill with mean or mode values respectfully
+    # these are the columns we are expecting in the csv file
+    expected_columns = [
+        'No.', 'Source', 'Destination', 'Protocol', 'Length', 'Timestamp', 
+        'RSSI', 'Channel Index', 'Advertising Address', 'Company ID', 
+        'Packet counter', 'Protocol version', 'UUID 16', 'Entry', 
+        'Device Name', 'Power Level (dBm)', 'Info', 'Label'
+    ]
+
+    df = df[expected_columns]   # set to make sure
+    
+    # fill NaN with information
+    df['No.'] = df['No.'].fillna(-1)
+    df['Source'] = df['Source'].fillna("00:00:00:00:00:00")
+    df['Destination'] = df['Destination'].fillna("broadcast")
+    df['Protocol'] = df['Protocol'].fillna("Unknown")
+    df['Length'] = df['Length'].fillna(-1)
     df['Timestamp'] = df['Timestamp'].fillna(-1.0)
     df['RSSI'] = df['RSSI'].fillna(1)
     df['Channel Index'] = df['Channel Index'].fillna(-1)
@@ -45,14 +65,24 @@ def cleaning_data(in_csv):
     df['Company ID'] = df['Company ID'].fillna(-1)
     df['Packet counter'] = df['Packet counter'].fillna(-1)
     df['Protocol version'] = df['Protocol version'].fillna(-1)
-    df['Power Level (dBm)'] = df['Power Level (dBm)'].fillna(-255)
     df['UUID 16'] = df['UUID 16'].fillna("None")
-
-    print("Data has been cleansed at cleansed_" + str(in_csv))
-    df.to_csv("cleansed_" + str(in_csv), index=False)
+    df['Entry'] = df['Entry'].fillna("None")
+    df['Device Name'] = df['Device Name'].fillna("Unnamed")
+    df['Power Level (dBm)'] = df['Power Level (dBm)'].fillna(-255)
+    df['Info'] = df['Info'].fillna("ADV_NONCONN_IND")
+    df['Label'] = df['Label'].fillna(-1)
 
     # print records
     print(df.head())
+
+    # save the cleaned data to a csv file in the cleaned folder
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    cleaned_folder = os.path.join(script_dir, "../data/cleaned")
+    os.makedirs(cleaned_folder, exist_ok=True)
+    input_file_name = os.path.basename(in_csv)
+    output_file = os.path.join(cleaned_folder, f"cleansed_{input_file_name}")
+    df.to_csv(output_file, index=False)
+    print(f"Data has been cleansed and saved at: {output_file}")
 
     return
 

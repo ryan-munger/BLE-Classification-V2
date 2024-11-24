@@ -19,3 +19,7 @@ pipenv shell
 ```terminal
 src/cleaningdata.py --csv "path/to/csv file"
 ```
+
+## Output
+
+The output of cleaningdata.py should be inside the cleaned folder
