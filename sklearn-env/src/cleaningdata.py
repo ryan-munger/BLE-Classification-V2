@@ -14,7 +14,7 @@ def cleaning_data(in_csv):
         df = pd.read_csv(in_csv, encoding='ISO-8859-1')
     except:
         print("Was unable to open the file...")
-        sys.exit(1)
+        sys.exit(-1)
 
     # --- not doing rn ----
     # list of columns we want to keep (provided by CS team)
