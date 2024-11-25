@@ -22,7 +22,7 @@ def cleaning_data(in_csv):
         'Destination': 'string',
         'Protocol': 'string',
         'Length': 'int64',
-        'Timestamp': 'string',
+        'Timestamp': 'float64',
         'RSSI': 'int64',
         'Channel Index': 'int64',
         'Advertising Address': 'string',
@@ -59,8 +59,9 @@ def cleaning_data(in_csv):
 
     # cleaning and converting column types
     df['RSSI'] = df['RSSI'].str.replace(' dBm', '').str.strip().astype(int)
+    df['Timestamp'] = df['Timestamp'].str.extract(r'(\d+)').astype(float)
     for column, dtype in expected_columns.items():
-            if column not in ['RSSI']:
+            if column not in ['RSSI', 'Timestamp']:
                 df[column] = df[column].str.replace(r'[,|-]', '', regex=True)
                 df[column] = df[column].astype(dtype)
 
