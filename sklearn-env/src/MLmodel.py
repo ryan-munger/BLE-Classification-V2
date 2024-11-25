@@ -8,6 +8,11 @@ import numpy as np
 
 # -- model imports --
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 
 # -- metrics/data imports --
 import matplotlib.pyplot as plt
@@ -33,7 +38,13 @@ def calculate(predictions, y_test):
 
 # model training
 def train_model(X_train, y_train):
-    model = RandomForestClassifier()
+    # model = RandomForestClassifier() -- 50
+    model = LogisticRegression() # -- 700
+    # model = LinearSVC() -- 500
+    # model = DecisionTreeClassifier() -- 75
+    # model = GaussianNB() -- 500
+    # model = KNeighborsClassifier() -- 40
+    
     model.fit(X_train, y_train)
     return model
 
