@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import argparse
 import sys
+import numpy as np
 
 # -- model imports --
 from sklearn.ensemble import RandomForestClassifier
@@ -27,8 +28,8 @@ def calculate(predictions, y_test):
     print('False Negative(FN) = ', FN)
     accuracy =  (TP + TN) / (TP + FP + TN + FN)
     print('Accuracy of the binary classifier = {:0.3f}'.format(accuracy))
-    print(classification_report(y_test, predictions))
-    print(accuracy_score(y_test, predictions))
+    print('classification report',classification_report(y_test, predictions))
+    print('Other accuracy check', accuracy_score(y_test, predictions))
 
 # model training
 def train_model(X_train, y_train):
@@ -50,7 +51,8 @@ def load_data(csv_file):
     # shuffle the dataset
     shuffledset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-    X = shuffledset.iloc[:, :-1]    # x is explanatory variables (all columns containing information about the packets except label)
+    X = shuffledset.select_dtypes(include=[np.number])
+    #X = shuffledset.iloc[:, :-1]    # x is explanatory variables (all columns containing information about the packets except label)
     y = shuffledset.iloc[:, -1] # y is target variables (in our case it would be the label column)
 
     return X, y
