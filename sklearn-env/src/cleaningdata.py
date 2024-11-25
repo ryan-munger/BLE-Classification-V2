@@ -5,6 +5,14 @@ import pandas as pd
 import argparse
 import os.path
 import sys
+import re
+
+# function to convert mac address to int using: https://gist.github.com/nlm/9ec20c78c4881cf23ed132ae59570340
+def mac_to_int(mac):
+    res = re.match('^((?:(?:[0-9a-f]{2}):){5}[0-9a-f]{2})$', mac.lower())
+    if res is None:
+        return 0
+    return int(res.group(0).replace(':', ''), 16)
 
 # function to clean the data
 def cleaning_data(in_csv):
@@ -18,14 +26,14 @@ def cleaning_data(in_csv):
     # these are the columns we are expecting in the csv file
     expected_columns = {
         'No.': 'int64',
-        'Source': 'string',
+        'Source': 'int64',
         'Destination': 'string',
         'Protocol': 'string',
         'Length': 'int64',
         'Timestamp': 'float64',
         'RSSI': 'int64',
         'Channel Index': 'int64',
-        'Advertising Address': 'string',
+        'Advertising Address': 'int64',
         'Company ID': 'string',
         'Packet counter': 'int64',
         'Protocol version': 'int64',
@@ -57,11 +65,18 @@ def cleaning_data(in_csv):
     df['Info'] = df['Info'].fillna("Unknown")
     df['Label'] = df['Label'].fillna("-1")
 
-    # cleaning and converting column types
+    # cleaning and converting RSSI and Timestamp specifically
     df['RSSI'] = df['RSSI'].str.replace(' dBm', '').str.strip().astype(int)
     df['Timestamp'] = df['Timestamp'].str.extract(r'(\d+)').astype(float)
+
+    # convert mac address to int
+    for mac_column in ['Source', 'Advertising Address']:
+        df[mac_column] = df[mac_column].apply(mac_to_int)
+        df[mac_column] = df[mac_column].astype('int64')
+
+    # cleaning and converting column types
     for column, dtype in expected_columns.items():
-            if column not in ['RSSI', 'Timestamp']:
+            if column not in ['RSSI', 'Timestamp', 'Source', 'Advertising Address']:
                 df[column] = df[column].str.replace(r'[,|-]', '', regex=True)
                 df[column] = df[column].astype(dtype)
 
