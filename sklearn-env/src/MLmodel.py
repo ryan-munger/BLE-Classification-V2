@@ -64,7 +64,7 @@ def load_data(csv_file):
     # shuffle the dataset
     shuffledset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-    X = shuffledset[["Source", "Timestamp", "Channel Index", "Advertising Address", "Power Level (dBm)"]] #select_dtypes(include=[np.number]).iloc[:, :-1] # x is explanatory variables (all columns containing information about the packets except label)
+    X = shuffledset[["Timestamp", "Channel Index", "Advertising Address", "Packet counter", "Power Level (dBm)"]] #select_dtypes(include=[np.number]).iloc[:, :-1] # x is explanatory variables (all columns containing information about the packets except label)
     # X = shuffledset[["Source", "Timestamp", "RSSI", "Channel Index", "Advertising Address", "Packet counter", "Protocol version", "Power Level (dBm)"]]
     y = shuffledset.iloc[:, -1] # y is target variables (in our case it would be the label column)
 
