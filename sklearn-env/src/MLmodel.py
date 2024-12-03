@@ -22,6 +22,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import RocCurveDisplay
 
 # model calculations and results
 def calculate(predictions, y_test):
@@ -131,6 +132,12 @@ def main():
 
     # model testing and evaluation
     predictions = model.predict(X_test)
+
+    ax = plt.gca()
+    model_graph = RocCurveDisplay.from_estimator(model, X_test, y_test)
+    model_graph.plot(ax=ax, alpha=0.8)
+
+    plt.show()
 
     # calculate metrics and performance
     calculate(predictions, y_test)
