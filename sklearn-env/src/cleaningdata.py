@@ -16,6 +16,7 @@ def mac_to_int(mac):
 
 # function to clean the data
 def cleaning_data(in_csv):
+    print("Inside cleanining data function", in_csv)
     try:
         # read the csv in to pandas using ISO encoding
         df = pd.read_csv(in_csv, encoding='ISO-8859-1', dtype='string', header=0)
@@ -38,7 +39,7 @@ def cleaning_data(in_csv):
         'Packet counter': 'int64',
         'Protocol version': 'int64',
         'UUID 16': 'string',
-        'Entry': 'string',
+#        'Entry': 'string',
         'Device Name': 'string',
         'Power Level (dBm)': 'int64',
         'Info': 'string',
@@ -59,8 +60,13 @@ def cleaning_data(in_csv):
     df['Packet counter'] = df['Packet counter'].fillna("-1")
     df['Protocol version'] = df['Protocol version'].fillna("-1")
     df['UUID 16'] = df['UUID 16'].fillna("None")
-    df['Entry'] = df['Entry'].fillna("None")
-    df['Device Name'] = df['Device Name'].fillna("Unnamed")
+#    df['Entry'] = df['Entry'].fillna("None")                                          # not important
+#    df['Device Name'] = df['Device Name'].fillna("Unnamed")
+    if 'Device Name' in df.columns:
+        df['Device Name'] = df['Device Name'].fillna("Unnamed")
+    else:
+        df['Device Name'] = "No Data"
+
     df['Power Level (dBm)'] = df['Power Level (dBm)'].fillna("-255")
     df['Info'] = df['Info'].fillna("Unknown")
     df['Label'] = df['Label'].fillna("-1")
@@ -82,8 +88,13 @@ def cleaning_data(in_csv):
 
     # save the cleaned data to the script dir
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_directory = os.path.join(script_dir, './../cleansed_data')
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+    os.chdir(output_directory) 
+
     input_file_name = os.path.basename(in_csv)
-    output_file = os.path.join(script_dir, f"cleansed_{input_file_name}")
+    output_file = os.path.join(output_directory, f"cleansed_{input_file_name}")
     df.to_csv(output_file, index=False)
     print(f"Data has been cleansed and saved at: {output_file}")
 
@@ -101,6 +112,8 @@ def command_line_args():
 # main function
 def main():
     args = command_line_args()  # grab command line arguments
+    print(args)
+    print("Inside main function")
 
     # does the path exist?
     if not os.path.exists(args.csv):
@@ -113,3 +126,19 @@ def main():
 # start script
 if __name__ == "__main__":
     main()
+
+
+
+#1. Fills the Missing Values
+#2. Clean/Convert Specific Fields
+#   - Removes "dBm" text and converts to int
+#   - Timestamp: Extracts numeric part using regex and converts to float\
+#3. Type conversion (Casting Columns)
+#4. Handle Remaining Missing Data
+#   - Drop completely empty columns
+#   - Drop rows with missing labels
+#   - Fill 
+#       - Numeric fields - with mean
+#       - Categorical fields - with "unknown"
+#   - Adds a _missing indicator column like Info_missing for each feature where values were missing
+#5. Save Cleaned Data
