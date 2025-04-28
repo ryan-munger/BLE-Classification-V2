@@ -11,7 +11,7 @@ import re
 def mac_to_int(mac):
     res = re.match('^((?:(?:[0-9a-f]{2}):){5}[0-9a-f]{2})$', mac.lower())
     if res is None:
-        return 0
+        return 0  # Changed from "" to 0 for consistency and to avoid potential errors
     return int(res.group(0).replace(':', ''), 16)
 
 # function to clean the data
@@ -19,7 +19,7 @@ def cleaning_data(in_csv):
     print("Inside cleanining data function", in_csv)
     try:
         # read the csv in to pandas using ISO encoding
-        df = pd.read_csv(in_csv, encoding='ISO-8859-1', dtype='string', header=0)
+        df = pd.read_csv(in_csv, encoding='ISO-8859-1', header=0)
     except Exception as e:
         print(f"Was unable to open the file... Error: {e}")
         sys.exit(-1)
@@ -39,7 +39,6 @@ def cleaning_data(in_csv):
         'Packet counter': 'int64',
         'Protocol version': 'int64',
         'UUID 16': 'string',
-#        'Entry': 'string',
         'Device Name': 'string',
         'Power Level (dBm)': 'int64',
         'Info': 'string',
@@ -47,33 +46,35 @@ def cleaning_data(in_csv):
     }
 
     # filling columns NaN values
-    df['No.'] = df['No.'].fillna("-1")
+    df['No.'] = pd.to_numeric(df['No.'], errors='coerce').fillna(-1).astype('int64')
     df['Source'] = df['Source'].fillna("00:00:00:00:00:00")
     df['Destination'] = df['Destination'].fillna("broadcast")
     df['Protocol'] = df['Protocol'].fillna("Unknown")
-    df['Length'] = df['Length'].fillna("-1")
-    df['Timestamp'] = df['Timestamp'].fillna("-1.0")
-    df['RSSI'] = df['RSSI'].fillna("1")
-    df['Channel Index'] = df['Channel Index'].fillna("-1")
+    df['Length'] = pd.to_numeric(df['Length'], errors='coerce').fillna(-1).astype('int64')
+    df['Timestamp'] = pd.to_numeric(df['Timestamp'], errors='coerce').fillna(-1.0).astype('float64')
+    df['RSSI'] = pd.to_numeric(df['RSSI'], errors='coerce').fillna(-255).astype('int64')
+    df['Channel Index'] = pd.to_numeric(df['Channel Index'], errors='coerce').fillna(-1).astype('int64')
     df['Advertising Address'] = df['Advertising Address'].fillna("00:00:00:00:00:00")
     df['Company ID'] = df['Company ID'].fillna("Unknown")
-    df['Packet counter'] = df['Packet counter'].fillna("-1")
-    df['Protocol version'] = df['Protocol version'].fillna("-1")
+    df['Packet counter'] = pd.to_numeric(df['Packet counter'], errors='coerce').fillna(-1).astype('int64')
+    df['Protocol version'] = pd.to_numeric(df['Protocol version'], errors='coerce').fillna(-1).astype('int64')
     df['UUID 16'] = df['UUID 16'].fillna("None")
-#    df['Entry'] = df['Entry'].fillna("None")                                          # not important
-#    df['Device Name'] = df['Device Name'].fillna("Unnamed")
     if 'Device Name' in df.columns:
         df['Device Name'] = df['Device Name'].fillna("Unnamed")
     else:
         df['Device Name'] = "No Data"
-
-    df['Power Level (dBm)'] = df['Power Level (dBm)'].fillna("-255")
+    df['Power Level (dBm)'] = pd.to_numeric(df['Power Level (dBm)'], errors='coerce').fillna(-255).astype('int64')
     df['Info'] = df['Info'].fillna("Unknown")
-    df['Label'] = df['Label'].fillna("-1")
+    df['Label'] = pd.to_numeric(df['Label'], errors='coerce').fillna(-1).astype('int64')
 
     # cleaning and converting RSSI and Timestamp specifically
-    df['RSSI'] = df['RSSI'].str.replace(' dBm', '').str.strip().astype(int)
-    df['Timestamp'] = df['Timestamp'].str.extract(r'(\d+)').astype(float)
+    if df['RSSI'].dtype == 'object':
+        df['RSSI'] = df['RSSI'].str.replace(' dBm', '').str.strip()
+    df['RSSI'] = pd.to_numeric(df['RSSI'], errors='coerce').fillna(-255).astype('int64')
+    
+    if df['Timestamp'].dtype == 'object':
+        df['Timestamp'] = df['Timestamp'].str.extract(r'(\d+\.\d+|\d+)')
+    df['Timestamp'] = pd.to_numeric(df['Timestamp'], errors='coerce').fillna(-1.0).astype('float64')
 
     # convert mac address to int
     for mac_column in ['Source', 'Advertising Address']:
@@ -82,16 +83,20 @@ def cleaning_data(in_csv):
 
     # cleaning and converting column types
     for column, dtype in expected_columns.items():
-            if column not in ['RSSI', 'Timestamp', 'Source', 'Advertising Address']:
+        if column not in ['RSSI', 'Timestamp', 'Source', 'Advertising Address']:
+            if df[column].dtype == 'object':
                 df[column] = df[column].str.replace(r'[,|-]', '', regex=True)
-                df[column] = df[column].astype(dtype)
+            if dtype == 'string':
+                df[column] = df[column].astype(str)
+            else:
+                df[column] = pd.to_numeric(df[column], errors='coerce').fillna(-1).astype(dtype)
 
     # save the cleaned data to the script dir
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_directory = os.path.join(script_dir, './../cleansed_data')
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
-    os.chdir(output_directory) 
+    os.chdir(output_directory)
 
     input_file_name = os.path.basename(in_csv)
     output_file = os.path.join(output_directory, f"cleansed_{input_file_name}")
@@ -126,19 +131,3 @@ def main():
 # start script
 if __name__ == "__main__":
     main()
-
-
-
-#1. Fills the Missing Values
-#2. Clean/Convert Specific Fields
-#   - Removes "dBm" text and converts to int
-#   - Timestamp: Extracts numeric part using regex and converts to float\
-#3. Type conversion (Casting Columns)
-#4. Handle Remaining Missing Data
-#   - Drop completely empty columns
-#   - Drop rows with missing labels
-#   - Fill 
-#       - Numeric fields - with mean
-#       - Categorical fields - with "unknown"
-#   - Adds a _missing indicator column like Info_missing for each feature where values were missing
-#5. Save Cleaned Data
