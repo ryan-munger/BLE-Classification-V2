@@ -1,5 +1,5 @@
 *.csv
-./ble-venv/*
+ble-venv/*
 */__pycache/*
 
 *.pyc
