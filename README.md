@@ -17,14 +17,3 @@ Following our general research into BLE, we started to look into specific Cybers
 ## Machine Learning
 
 Continuing on with the next project section, our research directed us toward the use of Machine Learning and how to find the best algorithm to use. ML is a vast subject which means selecting the right model is crucial to our projects success. Many models don't utilize the correct algorithms for our use case, therefore we would have to find a model that is either multi faceted or is specifically used for classification. Our research was narrowed down to the following algorithms which will be trained and tested in this github repository: Logistic Regression, Decision Trees, Random Forest, and Support Vector Machine (SVM).
-
-# Whats Needed?
-
-1. A computer
-
-# Setting Up The Environment...
-
-1. Navigate into the environment folder with "cd sklearn-env"
-2. Install all required dependecies with "pipenv install"
-3. Start the environment with "pipenv shell"
-4. To close the environement run "exit"

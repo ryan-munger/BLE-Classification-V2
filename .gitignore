@@ -1,2 +1,5 @@
 *.csv
-.DS_Store
+ble-venv/*
+*/__pycache/*
+
+*.pyc
