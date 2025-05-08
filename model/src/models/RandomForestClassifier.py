@@ -106,9 +106,7 @@ def load_data(csv_file):
     shuffledset = dataset.sample(frac=1, random_state=42).reset_index(drop=True)
 
     # Select features - using all relevant numerical features
-    X = shuffledset[["Source", "Timestamp", "RSSI", "Channel Index", 
-                    "Advertising Address", "Packet counter", 
-                    "Protocol version", "Power Level (dBm)"]]
+    X = shuffledset[["RSSI", "Channel Index", "Company ID", "Protocol version", "Power Level (dBm)", "OUI"]]
     y = shuffledset.iloc[:, -1]  # Target variable (label column)
 
     # Print dataset information
