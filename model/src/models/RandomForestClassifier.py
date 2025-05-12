@@ -9,11 +9,12 @@ from pathlib import Path
 
 # -- model imports --
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, cross_val_score
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, RocCurveDisplay, precision_recall_curve, average_precision_score
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.stats import randint
 
 # model calculations and results
 def calculate(predictions, y_test, probabilities=None):
@@ -50,42 +51,61 @@ def calculate(predictions, y_test, probabilities=None):
 # model training with hyperparameter tuning
 def train_model(X_train, y_train):
     # Define parameter grid for hyperparameter tuning
-    param_grid = {
-        'n_estimators': [50, 100, 200],        # Number of trees
-        'max_depth': [None, 10, 20, 30],       # Maximum depth of trees
-        'min_samples_split': [2, 5, 10],       # Minimum samples required to split
-        'min_samples_leaf': [1, 2, 4],         # Minimum samples required at leaf node
-        'max_features': ['sqrt', 'log2'],      # Number of features to consider
-        'class_weight': [None, 'balanced']     # Class weights
+    param_dist = {
+        # 'n_estimators': [50, 100, 200],        # Number of trees
+        # 'max_depth': [None, 10, 20, 30],       # Maximum depth of trees
+        # 'min_samples_split': [2, 5, 10],       # Minimum samples required to split
+        # 'min_samples_leaf': [1, 2, 4],         # Minimum samples required at leaf node
+        # 'max_features': ['sqrt', 'log2'],      # Number of features to consider
+        # 'class_weight': [None, 'balanced'],    # Class weights
+        # 'bootstrap': [True, False]             # Bootstrap samples for tree building
+
+        'n_estimators': [100, 200],  # Reduce to 2 values
+        'max_depth': [None, 10],      # Limit depth
+        'min_samples_split': [2, 5],  # Fewer options
+        'min_samples_leaf': [1, 2],   # Fewer options
+        'max_features': ['sqrt'],     # Use just one option
+        'class_weight': [None],       # Remove 'balanced'
+        'bootstrap': [True]           # Only one option
     }
     
     # Initialize base model
-    base_model = RandomForestClassifier(random_state=42)
+    base_model = RandomForestClassifier(random_state=42, n_jobs=-1, oob_score=True)
     
-    # Perform grid search
-    grid_search = GridSearchCV(
+    # Perform randomized search for hyperparameter optimization
+    print("\nTuning Random Forest hyperparameters...")
+    random_search = RandomizedSearchCV(
+        # estimator=base_model,
+        # param_distributions=param_dist,
+        # n_iter=10,               # Number of parameter settings to sample
+        # cv=5,                    # 5-fold cross-validation
+        # scoring='accuracy',
+        # n_jobs=-1,               # Use all available CPU cores
+        # verbose=1,
+        # random_state=42
         estimator=base_model,
-        param_grid=param_grid,
-        cv=5,              # 5-fold cross-validation
+        param_distributions=param_dist,
+        n_iter=5,               # Reduce to 5 iterations for faster testing
+        cv=5,                   # Keep 5-fold cross-validation
         scoring='accuracy',
-        n_jobs=-1,         # Use all available CPU cores
-        verbose=1
+        n_jobs=-1,
+        verbose=1,
+        random_state=42
     )
     
-    # Fit the grid search
-    print("\nTuning Random Forest hyperparameters...")
-    grid_search.fit(X_train, y_train)
+    # Fit the random search
+    random_search.fit(X_train, y_train)
     
     # Get the best model
-    best_model = grid_search.best_estimator_
+    best_model = random_search.best_estimator_
     
     # Print tuning results
     print("\nTuning Results:")
-    print(f"Best Parameters: {grid_search.best_params_}")
-    print(f"Best Cross-Validation Score: {grid_search.best_score_:.4f}")
+    print(f"Best Parameters: {random_search.best_params_}")
+    print(f"Best Cross-Validation Score: {random_search.best_score_:.4f}")
     
     # Perform cross-validation on the best model
-    cv_scores = cross_val_score(best_model, X_train, y_train, cv=5)
+    cv_scores = cross_val_score(best_model, X_train, y_train, cv=5, n_jobs=-1)
     print(f"\nCross-Validation Scores: {cv_scores}")
     print(f"Mean CV Score: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
     

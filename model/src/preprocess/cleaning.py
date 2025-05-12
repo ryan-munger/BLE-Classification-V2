@@ -17,9 +17,12 @@ def extract_oui(mac):
     """Extract the OUI (first three octets) from the MAC address as an integer."""
     if pd.isna(mac) or mac == 0:
         return 0
-    mac_str = f'{mac:012x}'
-    oui = mac_str[:6]
-    return int(oui, 16)
+    oui = mac[:8]
+    oui = oui.replace(':', '')
+    try:
+        return int(oui, 16)
+    except ValueError:  
+        return 0
 
 """
 RSSI values are now properly bounded (-100 to 0 dBm) 
@@ -160,6 +163,8 @@ def clean_data(in_csv):
     df['Channel Index'] = df['Channel Index'].apply(validate_channel_index)
     df['Power Level (dBm)'] = df['Power Level (dBm)'].apply(validate_power_level)
     df['OUI'] = df['Advertising Address'].apply(extract_oui)
+    print("dataframe", df)
+
     
     for mac_column in ['Source', 'Advertising Address']:
         df[mac_column] = df[mac_column].apply(validate_mac_address)

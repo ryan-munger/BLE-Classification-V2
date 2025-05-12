@@ -105,32 +105,32 @@ def preprocess_data():
     
     
     # Step 3: Feature Engineering
-    print("\n=== Step 3: Feature Engineering ===")
-    transformed_files = [f for f in os.listdir(transformed_path) if f.startswith('transformed_')]
-    print(f"Performing feature engineering on {len(transformed_files)} transformed files...")
+    # print("\n=== Step 3: Feature Engineering ===")
+    # transformed_files = [f for f in os.listdir(transformed_path) if f.startswith('transformed_')]
+    # print(f"Performing feature engineering on {len(transformed_files)} transformed files...")
     
-    # Process all transformed files
-    for i, filename in enumerate(transformed_files, 1):
-        try:
-            print(f"\nFeature engineering file {i}/{len(transformed_files)}: {filename}")
-            input_path = os.path.join(transformed_path, filename)
-            feature_engineering(input_path, 'data')
-        except Exception as e:
-            print(f"Error in feature engineering for {filename}: {str(e)}")
-            continue
+    # # Process all transformed files
+    # for i, filename in enumerate(transformed_files, 1):
+    #     try:
+    #         print(f"\nFeature engineering file {i}/{len(transformed_files)}: {filename}")
+    #         input_path = os.path.join(transformed_path, filename)
+    #         feature_engineering(input_path, 'data')
+    #     except Exception as e:
+    #         print(f"Error in feature engineering for {filename}: {str(e)}")
+    #         continue
     
-    # Load and validate final feature engineered dataset
-    if not os.path.exists(feature_engineered_path):
-        raise FileNotFoundError(f"Feature engineered dataset not found at {feature_engineered_path}")
+    # # Load and validate final feature engineered dataset
+    # if not os.path.exists(feature_engineered_path):
+    #     raise FileNotFoundError(f"Feature engineered dataset not found at {feature_engineered_path}")
         
-    print(f"Loading feature engineered data from {feature_engineered_path}...")
-    df = pd.read_csv(feature_engineered_path, low_memory=False)
+    # print(f"Loading feature engineered data from {feature_engineered_path}...")
+    # df = pd.read_csv(feature_engineered_path, low_memory=False)
     
-    if df.empty:
-        raise ValueError("Feature engineered dataset is empty")
+    # if df.empty:
+    #     raise ValueError("Feature engineered dataset is empty")
         
-    if 'Label' not in df.columns:
-        raise ValueError("Feature engineered dataset missing 'Label' column")
+    # if 'Label' not in df.columns:
+    #     raise ValueError("Feature engineered dataset missing 'Label' column")
     
     return df
 
