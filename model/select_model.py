@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+all_cleaned_data = []
 def preprocess_data():
     """
     Perform all preprocessing steps in sequence:
@@ -50,7 +51,9 @@ def preprocess_data():
         try:
             print(f"\nProcessing file {i}/{len(captured_files)}: {filename}")
             input_path = os.path.join(captured_path, filename)
-            output_path = os.path.join(cleansed_path, f'cleaned_{filename}')
+            # output_path = os.path.join(cleansed_path, f'cleaned_{filename}')
+            output_path = os.path.join(cleansed_path, f'cleaned_data')
+
             
             # Clean the data
             df = clean_data(input_path)
@@ -58,6 +61,8 @@ def preprocess_data():
                 print(f"Warning: Empty dataframe after cleaning {filename}")
                 continue
                 
+             # Append to the list
+            all_cleaned_data.append(df)
             
             # Save cleaned data
             print(f"Saving cleaned data to {output_path}...")
@@ -67,6 +72,15 @@ def preprocess_data():
             print(f"Error processing {filename}: {str(e)}")
             continue
     
+    # After the loop, concatenate and save to a single file
+    if all_cleaned_data:
+        combined_df = pd.concat(all_cleaned_data, ignore_index=True)
+        output_path = os.path.join(cleansed_path, 'cleaned_data.csv')
+        print(f"\nSaving all cleaned data to {output_path}...")
+        combined_df.to_csv(output_path, index=False)
+    else:
+        print("No data to save.")
+
     # Step 2: Transform the data
     print("\n=== Step 2: Transforming Data ===")
     cleaned_files = [f for f in os.listdir(cleansed_path) if f.startswith('cleaned_')]
