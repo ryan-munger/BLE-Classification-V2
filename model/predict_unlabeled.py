@@ -48,24 +48,26 @@ def process_file(input_path, model):
         if df.empty:
             print(f"Warning: Empty dataframe")
             
-        df = transform_data(df)    
+        df = transform_data(df)
+
+        X = df[["RSSI", "Channel Index", "Company ID", "Protocol version", "Power Level (dBm)"]]
+        predictions = model.predict(X)
+
+        # Write predictions to a file
+        # Get current date and time
+        now = datetime.datetime.now()
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
+
+        # Construct the file path with timestamp
+        predictions_file_path = f'./output/predictions_{timestamp}.txt'
+        with open(predictions_file_path, 'w') as f:
+            for prediction in predictions:
+                f.write(str(prediction) + '\n')
+        print(f"\nPredictions written to: {predictions_file_path}")
+            
     except Exception as e:
-        print("Processing error: {e}")
-    
-    X = df[["RSSI", "Channel Index", "Company ID", "Protocol version", "Power Level (dBm)"]]
-    predictions = model.predict(X)
+        print(f"Processing error: {e}")
 
-    # Write predictions to a file
-    # Get current date and time
-    now = datetime.datetime.now()
-    timestamp = now.strftime("%Y%m%d_%H%M%S")
-
-    # Construct the file path with timestamp
-    predictions_file_path = f'./output/predictions_{timestamp}.txt'
-    with open(predictions_file_path, 'w') as f:
-        for prediction in predictions:
-            f.write(str(prediction) + '\n')
-    print(f"\nPredictions written to: {predictions_file_path}")
 
 # Command line arguments
 def command_line_args():
