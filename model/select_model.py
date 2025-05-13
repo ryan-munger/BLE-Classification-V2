@@ -210,6 +210,8 @@ def select_and_train_model(df):
         print("\nTraining Random Forest model...")
         model = train_rf(X_train, y_train)
         model_name = 'RandomForestClassifier'
+
+        print(model.feature_names_in_)
         
         # Make predictions
         predictions = model.predict(X_test)
@@ -231,6 +233,9 @@ def select_and_train_model(df):
 if __name__ == "__main__":
     # Perform all preprocessing steps
     df = preprocess_data()
-    
+
+    selected_features = ["RSSI", "Channel Index", "Company ID", "Protocol version", "Power Level (dBm)", "Label"]
+    df = df[selected_features]
+
     # Train and evaluate the selected model
     select_and_train_model(df)

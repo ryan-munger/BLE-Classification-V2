@@ -70,7 +70,7 @@ def train_model(X_train, y_train):
     }
     
     # Initialize base model
-    base_model = RandomForestClassifier(random_state=42, n_jobs=-1, oob_score=True)
+    base_model = RandomForestClassifier(random_state=42, n_jobs=2, oob_score=True)
     
     # Perform randomized search for hyperparameter optimization
     print("\nTuning Random Forest hyperparameters...")
@@ -80,7 +80,7 @@ def train_model(X_train, y_train):
         # n_iter=10,               # Number of parameter settings to sample
         # cv=5,                    # 5-fold cross-validation
         # scoring='accuracy',
-        # n_jobs=-1,               # Use all available CPU cores
+        # n_jobs=2,               # Use all available CPU cores
         # verbose=1,
         # random_state=42
         estimator=base_model,
@@ -88,7 +88,7 @@ def train_model(X_train, y_train):
         n_iter=5,               # Reduce to 5 iterations for faster testing
         cv=5,                   # Keep 5-fold cross-validation
         scoring='accuracy',
-        n_jobs=-1,
+        n_jobs=2,
         verbose=1,
         random_state=42
     )
@@ -105,7 +105,7 @@ def train_model(X_train, y_train):
     print(f"Best Cross-Validation Score: {random_search.best_score_:.4f}")
     
     # Perform cross-validation on the best model
-    cv_scores = cross_val_score(best_model, X_train, y_train, cv=5, n_jobs=-1)
+    cv_scores = cross_val_score(best_model, X_train, y_train, cv=5, n_jobs=2)
     print(f"\nCross-Validation Scores: {cv_scores}")
     print(f"Mean CV Score: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
     
@@ -126,7 +126,7 @@ def load_data(csv_file):
     shuffledset = dataset.sample(frac=1, random_state=42).reset_index(drop=True)
 
     # Select features - using all relevant numerical features
-    X = shuffledset[["RSSI", "Channel Index", "Company ID", "Protocol version", "Power Level (dBm)", "OUI"]]
+    X = shuffledset[["RSSI", "Channel Index", "Company ID", "Protocol version", "Power Level (dBm)"]]
     y = shuffledset.iloc[:, -1]  # Target variable (label column)
 
     # Print dataset information
